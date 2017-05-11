@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"github.com/ngaut/log"
+	"github.com/siddontang/go-mysql/client"
 	. "github.com/siddontang/go-mysql/mysql"
 	"github.com/juju/errors"
 )
@@ -30,6 +32,8 @@ type Dumper struct {
 	IgnoreTables map[string][]string
 
 	ErrOut io.Writer
+
+	c *client.Conn
 }
 
 func NewDumper(executionPath string, addr string, user string, password string) (*Dumper, error) {
@@ -140,7 +144,13 @@ func (d *Dumper) Dump(w io.Writer) error {
 		w.Write([]byte(fmt.Sprintf("USE `%s`;\n", d.TableDB)))
 	}
 
-	w.Write([]byte(fmt.Sprintf("CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin-log.123123', MASTER_LOG_POS=1231231;\n")))
+	if rSlaveStatus, errSlaveStatus := d.c.Execute("SHOW SLAVE STATUS"); errSlaveStatus != nil {
+		log.Errorf("No slave status received")
+	} else {
+		log.Infof(rSlaveStatus.getString(0, 5))
+		log.Infof(rSlaveStatus.getString(0, 6))
+		w.Write([]byte(fmt.Sprintf("CHANGE MASTER TO MASTER_LOG_FILE='%s', MASTER_LOG_POS=%s;\n", rSlaveStatus.getString(0, 5), rSlaveStatus.getString(0, 6))))
+	}
 
 	if len(d.Charset) != 0 {
 		args = append(args, fmt.Sprintf("--default-character-set=%s", d.Charset))

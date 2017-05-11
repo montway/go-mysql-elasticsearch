@@ -140,6 +140,8 @@ func (d *Dumper) Dump(w io.Writer) error {
 		w.Write([]byte(fmt.Sprintf("USE `%s`;\n", d.TableDB)))
 	}
 
+	w.Write([]byte(fmt.Sprintf("CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin-log.123123', MASTER_LOG_POS=1231231;\n")))
+
 	if len(d.Charset) != 0 {
 		args = append(args, fmt.Sprintf("--default-character-set=%s", d.Charset))
 	}

@@ -91,8 +91,7 @@ func (h *eventHandler) String() string {
 
 func (r *River) SetRefreshInterval(interval string) {
 	mapIndices := map[string]bool{}
-	for i := 0; i < len(r.rules); i += 1 {
-		rule := r.rules[i]
+	for _, rule := range r.rules {
 		if mapIndices[rule.Index] != true {
 			mapIndices[rule.Index] = true
 			r.es.SetRefreshInterval(rule.Index, interval)

@@ -34,6 +34,8 @@ type River struct {
 	master *masterInfo
 
 	syncCh chan interface{}
+
+	refreshedInterval bool
 }
 
 func NewRiver(c *Config) (*River, error) {

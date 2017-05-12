@@ -33,12 +33,11 @@ type posSaver struct {
 
 type eventHandler struct {
 	r *River
-	refreshedInterval bool
 }
 
 func (h *eventHandler) OnRotate(e *replication.RotateEvent) error {
-	if h.refreshedInterval != true {
-		h.refreshedInterval = true
+	if h.r.refreshedInterval != true {
+		h.r.refreshedInterval = true
 		log.Infof("Setting refresh interval to 1s")
 		h.r.SetRefreshInterval("1s")
 	}

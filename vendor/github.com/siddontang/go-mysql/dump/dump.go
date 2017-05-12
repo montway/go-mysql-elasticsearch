@@ -144,23 +144,14 @@ func (d *Dumper) Dump(w io.Writer) error {
 		w.Write([]byte(fmt.Sprintf("USE `%s`;\n", d.TableDB)))
 	}
 
-	log.Infof("Before client init")
-	log.Infof(d.Addr)
-	d.c, _ = client.Connect(d.Addr, d.User, d.Password, "", func(c *client.Conn) {
-		log.Infof("Callback show slave")
-		//c.TLSConfig = b.cfg.TLSConfig
-	})
+	d.c, _ = client.Connect(d.Addr, d.User, d.Password, "", func(c *client.Conn) {})
 
-	log.Infof("Before show slave")
-	if rSlaveStatus, errSlaveStatus := d.c.Execute("SHOW MASTER STATUS"); errSlaveStatus != nil {
-		log.Errorf("No slave status received")
+	if rMasterStatus, errMasterStatus := d.c.Execute("SHOW MASTER STATUS"); errMasterStatus != nil {
+		log.Errorf("No master status received")
 	} else {
-		fmt.Printf("%+v\n", rSlaveStatus.RowDatas)
-		lfile, _ := rSlaveStatus.GetString(0, 0)
-		lseq, _ := rSlaveStatus.GetString(0, 1)
-		log.Infof(lfile)
-		log.Infof(lseq)
-		w.Write([]byte(fmt.Sprintf("CHANGE MASTER TO MASTER_LOG_FILE='%s', MASTER_LOG_POS=%s;\n", lfile, lseq)))
+		lfile, _ := rMasterStatus.GetString(0, 0)
+		lpos, _ := rMasterStatus.GetString(0, 1)
+		w.Write([]byte(fmt.Sprintf("CHANGE MASTER TO MASTER_LOG_FILE='%s', MASTER_LOG_POS=%s;\n", lfile, lpos)))
 	}
 
 	if len(d.Charset) != 0 {

@@ -144,6 +144,9 @@ func (d *Dumper) Dump(w io.Writer) error {
 		w.Write([]byte(fmt.Sprintf("USE `%s`;\n", d.TableDB)))
 	}
 
+	d.c, _ = client.Connect(d.Addr, d.User, d.Password, "", func(c *client.Conn) {
+		//c.TLSConfig = b.cfg.TLSConfig
+	})
 	if rSlaveStatus, errSlaveStatus := d.c.Execute("SHOW SLAVE STATUS"); errSlaveStatus != nil {
 		log.Errorf("No slave status received")
 	} else {

@@ -215,7 +215,7 @@ func (c *Client) SetRefreshInterval(index string, interval string) error {
 		},
 	}
 
-	_, err = c.Do("PUT", reqUrl, mapping)
+	_, err := c.Do("PUT", reqUrl, mapping)
 	return errors.Trace(err)
 }
 

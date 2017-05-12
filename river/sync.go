@@ -33,9 +33,16 @@ type posSaver struct {
 
 type eventHandler struct {
 	r *River
+	refreshedInterval bool
 }
 
 func (h *eventHandler) OnRotate(e *replication.RotateEvent) error {
+	if h.refreshedInterval != true {
+		h.refreshedInterval = true
+		log.Infof("Setting refresh interval to 1s")
+		h.r.SetRefreshInterval("1s")
+	}
+
 	pos := mysql.Position{
 		string(e.NextLogName),
 		uint32(e.Position),
@@ -100,9 +107,6 @@ func (r *River) SetRefreshInterval(interval string) {
 }
 
 func (r *River) syncLoop() {
-	log.Infof("Setting refresh interval to 1s")
-	r.SetRefreshInterval("1s")
-
 	bulkSize := r.c.BulkSize
 	if bulkSize == 0 {
 		bulkSize = 128

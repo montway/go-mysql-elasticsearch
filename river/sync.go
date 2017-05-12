@@ -89,6 +89,17 @@ func (h *eventHandler) String() string {
 	return "ESRiverEventHandler"
 }
 
+func (r *River) SetRefreshInterval(interval string) {
+	mapIndices := map[string]bool{}
+	for i := 0; i < len(r.rules); i += 1 {
+		rule := r.rules[i]
+		if mapIndices[rule.Index] != true {
+			mapIndices[rule.Index] = true
+			r.es.SetRefreshInterval(rule.Index, interval)
+		}
+	}
+}
+
 func (r *River) syncLoop() {
 	bulkSize := r.c.BulkSize
 	if bulkSize == 0 {

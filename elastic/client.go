@@ -205,6 +205,20 @@ func (c *Client) DoBulk(url string, items []*BulkRequest) (*BulkResponse, error)
 	return ret, errors.Trace(err)
 }
 
+func (c *Client) SetRefreshInterval(index string, interval string) error {
+	reqUrl := fmt.Sprintf("http://%s/%s/_settings", c.Addr,
+		url.QueryEscape(index))
+
+	mapping := map[string]interface{}{
+		"settings": map[string]interface{}{
+			"index": map[string]string{"refresh_interval": interval},
+		},
+	}
+
+	_, err = c.Do("PUT", reqUrl, mapping)
+	return errors.Trace(err)
+}
+
 func (c *Client) CreateMapping(index string, docType string, mapping map[string]interface{}) error {
 	reqUrl := fmt.Sprintf("http://%s/%s", c.Addr,
 		url.QueryEscape(index))

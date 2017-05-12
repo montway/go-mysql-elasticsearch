@@ -147,10 +147,10 @@ func (d *Dumper) Dump(w io.Writer) error {
 	if rSlaveStatus, errSlaveStatus := d.c.Execute("SHOW SLAVE STATUS"); errSlaveStatus != nil {
 		log.Errorf("No slave status received")
 	} else {
-		fmt.Printf("%+v\n", rSlaveStatus)
-		//lfile, _ := rSlaveStatus.GetString(0, 5)
+		//fmt.Printf("%+v\n", rSlaveStatus)
+		lfile, _ := rSlaveStatus.GetString(0, 1)
 		//lseq, _ := rSlaveStatus.GetString(0, 6)
-		//log.Infof(lfile)
+		log.Infof(lfile)
 		//log.Infof(lseq)
 		w.Write([]byte(fmt.Sprintf("CHANGE MASTER TO MASTER_LOG_FILE='%s', MASTER_LOG_POS=%s;\n", "123123", "1231232")))
 	}

@@ -155,7 +155,7 @@ func (d *Dumper) Dump(w io.Writer) error {
 	if rSlaveStatus, errSlaveStatus := d.c.Execute("SHOW SLAVE STATUS"); errSlaveStatus != nil {
 		log.Errorf("No slave status received")
 	} else {
-		fmt.Printf("%+v\n", rSlaveStatus)
+		fmt.Printf("%+v\n", rSlaveStatus.RowDatas)
 		lfile, _ := rSlaveStatus.GetString(0, 5)
 		lseq, _ := rSlaveStatus.GetString(0, 6)
 		log.Infof(lfile)

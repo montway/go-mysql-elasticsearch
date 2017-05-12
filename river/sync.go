@@ -100,6 +100,9 @@ func (r *River) SetRefreshInterval(interval string) {
 }
 
 func (r *River) syncLoop() {
+	log.Infof("Setting refresh interval to 1s")
+	r.SetRefreshInterval("1s")
+
 	bulkSize := r.c.BulkSize
 	if bulkSize == 0 {
 		bulkSize = 128

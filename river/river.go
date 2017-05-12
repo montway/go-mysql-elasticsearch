@@ -246,8 +246,6 @@ func ruleKey(schema string, table string) string {
 }
 
 func (r *River) Start() error {
-	r.SetRefreshInterval("1s")
-
 	r.wg.Add(1)
 	go r.syncLoop()
 

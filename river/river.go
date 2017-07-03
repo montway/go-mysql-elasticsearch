@@ -290,7 +290,7 @@ func (r *River) Close() {
 
 	r.master.Close()
 
-	if waitTimeout(r.wg, 10 * time.Second) == true {
+	if waitTimeout(&r.wg, 10 * time.Second) == true {
 		log.Info("Timed out waiting on Workgroup")
 	}
 }

@@ -157,7 +157,7 @@ func (r *River) syncLoop() {
 				} else {
 					break // doBulk() was successful
 				}
-				if retryCounter > 10; {
+				if retryCounter > 10 {
 					log.Error("doBulk() retry count exceeded. Giving up!")
 					r.cancel()
 					return

@@ -10,6 +10,7 @@ import (
 	"github.com/siddontang/go-mysql-elasticsearch/elastic"
 	"github.com/siddontang/go-mysql/canal"
 	"golang.org/x/net/context"
+	"time"
 )
 
 // In Elasticsearch, river is a pluggable service within Elasticsearch pulling data then indexing it into Elasticsearch.
@@ -264,6 +265,22 @@ func (r *River) Ctx() context.Context {
 	return r.ctx
 }
 
+// waitTimeout waits for the waitgroup for the specified max timeout.
+// Returns true if waiting timed out.
+func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
+    c := make(chan struct{})
+    go func() {
+        defer close(c)
+        wg.Wait()
+    }()
+    select {
+    case <-c:
+        return false // completed normally
+    case <-time.After(timeout):
+        return true // timed out
+    }
+}
+
 func (r *River) Close() {
 	log.Infof("closing river")
 
@@ -273,5 +290,7 @@ func (r *River) Close() {
 
 	r.master.Close()
 
-	r.wg.Wait()
+	if waitTimeout(r.wg, 10 * time.Second) == true {
+		log.Info("Timed out waiting on Workgroup")
+	}
 }

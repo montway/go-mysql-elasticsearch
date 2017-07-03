@@ -151,12 +151,20 @@ func (r *River) syncLoop() {
 		}
 
 		if needFlush {
-			// TODO: retry some times?
-			if err := r.doBulk(reqs); err != nil {
-				log.Errorf("do ES bulk err %v, close sync", err)
-				r.cancel()
-				return
+			for retryCounter := 1 ;; retryCounter++ {
+				if err := r.doBulk(reqs); err != nil {
+					log.Errorf("attempt %i fail, do ES bulk err %v\nRetrying!", retryCounter, err)
+				} else {
+					break // doBulk() was successful
+				}
+				if retryCounter > 10; {
+					log.Error("doBulk() retry count exceeded. Giving up!")
+					r.cancel()
+					return
+				}
+				time.Sleep(2 * time.Second)
 			}
+
 			reqs = reqs[0:0]
 		}
 
